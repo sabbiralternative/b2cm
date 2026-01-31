@@ -1,9 +1,9 @@
 import { jwtDecode } from "jwt-decode";
 import { useMemo } from "react";
-import useContextState from "./useContextState";
+import { useSelector } from "react-redux";
 
 export const usePermission = () => {
-  const { token } = useContextState();
+  const { token } = useSelector((state) => state.auth);
 
   const permissions = useMemo(() => {
     if (!token) return [];

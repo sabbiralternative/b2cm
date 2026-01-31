@@ -1,39 +1,56 @@
+import { useSelector } from "react-redux";
+import assets from "../../assets";
+import { useUser } from "../../hooks/use-user";
+import { usePermission } from "../../hooks/use-permission";
+import { useState } from "react";
+import { useGetIndexQuery } from "../../hooks";
+import { useBalanceQuery } from "../../hooks/balance";
+import moment from "moment";
+import Loader from "../../components/shared/Loader/Loader";
+
 const Home = () => {
+  const { adminRole } = useSelector((state) => state.auth);
+  const today = new Date();
+  const { user } = useUser();
+  const [date, setDate] = useState(new Date());
+  const { permissions } = usePermission();
+  const { data } = useGetIndexQuery({ type: "getDashboardDW" });
+  const {
+    data: balanceData,
+    isLoading,
+    isPending,
+  } = useBalanceQuery({
+    date: moment(date).format("YYYY-MM-DD"),
+    user_id: user?.user_id,
+    role: user?.role,
+  });
+
+  const defineBalanceColor = (amount) => {
+    if (amount) {
+      const parseAmount = parseFloat(amount);
+      if (parseAmount === 0) {
+        return "white";
+      } else if (parseAmount > 0) {
+        return "#39da8a";
+      } else {
+        return "#ff5b5c";
+      }
+    }
+  };
+  const deposit = data?.result?.deposit;
+  const withdraw = data?.result?.withdraw;
+  const rejected_deposit = data?.result?.rejected_deposit;
+  const rejected_withdraw = data?.result?.rejected_withdraw;
+
+  const disableOutsideLast14Days = (date) => {
+    const start = new Date();
+    start.setDate(today.getDate() - 14);
+
+    return date < start || date > today;
+  };
+
   return (
     <div id="page">
-      <div className="header header-fixed header-logo-center header-auto-show">
-        <a href="index.html" className="header-title">
-          Sticky Mobile
-        </a>
-        <a href="#" data-back-button className="header-icon header-icon-1">
-          <i className="fas fa-arrow-left" />
-        </a>
-        <a href="#" data-toggle-theme className="header-icon header-icon-4">
-          <i className="fas fa-lightbulb" />
-        </a>
-      </div>
-      <div id="footer-bar" className="footer-bar-1">
-        <a href="index.html">
-          <i className="fa fa-home" />
-          <span>Home</span>
-        </a>
-        <a href="index-components.html">
-          <i className="fa fa-star" />
-          <span>Features</span>
-        </a>
-        <a href="index-pages.html" className="active-nav">
-          <i className="fa fa-heart" />
-          <span>Menu</span>
-        </a>
-        <a href="index-search.html">
-          <i className="fa fa-search" />
-          <span>Search</span>
-        </a>
-        <a href="#" data-menu="menu-settings">
-          <i className="fa fa-cog" />
-          <span>Settings</span>
-        </a>
-      </div>
       <div className="page-content">
         <div className="content notch-clear">
           <div className="d-flex pt-2">
@@ -41,12 +58,12 @@ const Home = () => {
               <strong className="text-uppercase opacity-60 font-11">
                 Welcome Back
               </strong>
-              <h1 className="mt-n2 font-27">magicadmin</h1>
+              <h1 className="mt-n2 font-27">{adminRole}</h1>
             </div>
             <div className="align-self-center ms-auto">
               <a href="#" className="d-block" data-menu="menu-settings">
                 <img
-                  src="images/pictures/faces/2s.png"
+                  src={assets.user}
                   className="img-fluid shadow-xl rounded-circle"
                   width={45}
                 />
@@ -83,7 +100,14 @@ const Home = () => {
               <div className="card card-style mx-0 mb-3" data-card-height={80}>
                 <div className="d-flex p-3">
                   <div>
-                    <h1 className="mb-n2">58,88,555</h1>
+                    <h1 className="mb-n2">
+                      {" "}
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.upperLevel
+                      )}
+                    </h1>
                     <span className="font-11">Upper Level</span>
                   </div>
                   <div className="ms-auto align-self-center">
@@ -92,15 +116,21 @@ const Home = () => {
                 </div>
               </div>
             </div>
-            <div className="col-6 ps-2">
+            <div className="col-6 pe-2">
               <div className="card card-style mx-0 mb-3" data-card-height={80}>
                 <div className="d-flex p-3">
                   <div>
-                    <h1 className="mb-n2">15.3k</h1>
-                    <span className="font-11">P/L Today</span>
+                    <h1 className="mb-n2">
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.downLevelOccupyBalance
+                      )}
+                    </h1>
+                    <span className="font-11">Total Client Balance</span>
                   </div>
                   <div className="ms-auto align-self-center">
-                    <i className="color-blue-dark fa fa-minus font-18" />
+                    <i className="color-green-dark fa fa-angle-up font-18" />
                   </div>
                 </div>
               </div>
@@ -109,8 +139,74 @@ const Home = () => {
               <div className="card card-style mx-0 mb-3" data-card-height={80}>
                 <div className="d-flex p-3">
                   <div>
-                    <h1 className="mb-n2">35.1k</h1>
-                    <span className="font-11">Deposit Today</span>
+                    <h1 className="mb-n2">
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.availableBalance ||
+                        (balanceData?.availableBalance == 0 &&
+                          balanceData?.availableBalance?.toFixed(2))
+                      )}
+                    </h1>
+                    <span className="font-11">Available Balance</span>
+                  </div>
+                  <div className="ms-auto align-self-center">
+                    <i className="color-green-dark fa fa-angle-up font-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6 pe-2">
+              <div className="card card-style mx-0 mb-3" data-card-height={80}>
+                <div className="d-flex p-3">
+                  <div>
+                    <h1 className="mb-n2">
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.totalMasterBalance
+                      )}
+                    </h1>
+                    <span className="font-11">Total Master Balance</span>
+                  </div>
+                  <div className="ms-auto align-self-center">
+                    <i className="color-green-dark fa fa-angle-up font-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6 pe-2">
+              <div className="card card-style mx-0 mb-3" data-card-height={80}>
+                <div className="d-flex p-3">
+                  <div>
+                    <h1 className="mb-n2">
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.usersToday
+                      )}
+                    </h1>
+                    <span className="font-11">New Users Today</span>
+                  </div>
+                  <div className="ms-auto align-self-center">
+                    <i className="color-green-dark fa fa-angle-up font-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6 pe-2">
+              <div className="card card-style mx-0 mb-3" data-card-height={80}>
+                <div className="d-flex p-3">
+                  <div>
+                    <h1 className="mb-n2">
+                      {" "}
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.depositToday
+                      )}
+                    </h1>
+                    <span className="font-11">Total Deposit Today</span>
                   </div>
                   <div className="ms-auto align-self-center">
                     <i className="color-red-dark fa fa-angle-down font-18" />
@@ -118,6 +214,51 @@ const Home = () => {
                 </div>
               </div>
             </div>
+            <div className="col-6 pe-2">
+              <div className="card card-style mx-0 mb-3" data-card-height={80}>
+                <div className="d-flex p-3">
+                  <div>
+                    <h1 className="mb-n2">
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.withdrawToday
+                      )}
+                    </h1>
+                    <span className="font-11">Total Withdraw Today</span>
+                  </div>
+                  <div className="ms-auto align-self-center">
+                    <i className="color-red-dark fa fa-angle-down font-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6 ps-2">
+              <div className="card card-style mx-0 mb-3" data-card-height={80}>
+                <div className="d-flex p-3">
+                  <div>
+                    <h1
+                      style={{
+                        color: `${defineBalanceColor(balanceData?.pnlToday)}`,
+                      }}
+                      className="mb-n2"
+                    >
+                      {" "}
+                      {isLoading || isPending ? (
+                        <Loader />
+                      ) : (
+                        balanceData?.pnlToday
+                      )}
+                    </h1>
+                    <span className="font-11">P/L Today</span>
+                  </div>
+                  <div className="ms-auto align-self-center">
+                    <i className="color-blue-dark fa fa-minus font-18" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="col-6 ps-2">
               <div className="card card-style mx-0 mb-3" data-card-height={80}>
                 <div className="d-flex p-3">
@@ -255,276 +396,6 @@ const Home = () => {
                   </p>
                 </div>
               </div>
-            </a>
-          </div>
-        </div>
-      </div>
-      {/* End of Page Content*/}
-      {/* All Menus, Action Sheets, Modals, Notifications, Toasts, Snackbars get Placed outside the <div class="page-content"> */}
-      <div
-        id="menu-settings"
-        className="menu menu-box-bottom menu-box-detached"
-      >
-        <div className="menu-title mt-0 pt-0">
-          <h1>Settings</h1>
-          <p className="color-highlight">Flexible and Easy to Use</p>
-          <a href="#" className="close-menu">
-            <i className="fa fa-times" />
-          </a>
-        </div>
-        <div className="divider divider-margins mb-n2" />
-        <div className="content">
-          <div className="list-group list-custom-small">
-            <a
-              href="#"
-              data-toggle-theme
-              data-trigger-switch="switch-dark-mode"
-              className="pb-2 ms-n1"
-            >
-              <i className="fa font-12 fa-moon rounded-s bg-highlight color-white me-3" />
-              <span>Dark Mode</span>
-              <div className="custom-control scale-switch ios-switch">
-                <input
-                  data-toggle-theme
-                  type="checkbox"
-                  className="ios-input"
-                  id="switch-dark-mode"
-                />
-                <label
-                  className="custom-control-label"
-                  htmlFor="switch-dark-mode"
-                />
-              </div>
-              <i className="fa fa-angle-right" />
-            </a>
-          </div>
-          <div className="list-group list-custom-large">
-            <a data-menu="menu-highlights" href="#">
-              <i className="fa font-14 fa-tint bg-green-dark rounded-s" />
-              <span>Page Highlight</span>
-              <strong>16 Colors Highlights Included</strong>
-              <span className="badge bg-highlight color-white">HOT</span>
-              <i className="fa fa-angle-right" />
-            </a>
-            <a data-menu="menu-backgrounds" href="#" className="border-0">
-              <i className="fa font-14 fa-cog bg-blue-dark rounded-s" />
-              <span>Background Color</span>
-              <strong>10 Page Gradients Included</strong>
-              <span className="badge bg-highlight color-white">NEW</span>
-              <i className="fa fa-angle-right" />
-            </a>
-          </div>
-        </div>
-      </div>
-      {/* Menu Settings Highlights*/}
-      <div
-        id="menu-highlights"
-        className="menu menu-box-bottom menu-box-detached"
-      >
-        <div className="menu-title">
-          <h1>Highlights</h1>
-          <p className="color-highlight">
-            Any Element can have a Highlight Color
-          </p>
-          <a href="#" className="close-menu">
-            <i className="fa fa-times" />
-          </a>
-        </div>
-        <div className="divider divider-margins mb-n2" />
-        <div className="content">
-          <div className="highlight-changer">
-            <a href="#" data-change-highlight="blue">
-              <i className="fa fa-circle color-blue-dark" />
-              <span className="color-blue-light">Default</span>
-            </a>
-            <a href="#" data-change-highlight="red">
-              <i className="fa fa-circle color-red-dark" />
-              <span className="color-red-light">Red</span>
-            </a>
-            <a href="#" data-change-highlight="orange">
-              <i className="fa fa-circle color-orange-dark" />
-              <span className="color-orange-light">Orange</span>
-            </a>
-            <a href="#" data-change-highlight="pink2">
-              <i className="fa fa-circle color-pink2-dark" />
-              <span className="color-pink-dark">Pink</span>
-            </a>
-            <a href="#" data-change-highlight="magenta">
-              <i className="fa fa-circle color-magenta-dark" />
-              <span className="color-magenta-light">Purple</span>
-            </a>
-            <a href="#" data-change-highlight="aqua">
-              <i className="fa fa-circle color-aqua-dark" />
-              <span className="color-aqua-light">Aqua</span>
-            </a>
-            <a href="#" data-change-highlight="teal">
-              <i className="fa fa-circle color-teal-dark" />
-              <span className="color-teal-light">Teal</span>
-            </a>
-            <a href="#" data-change-highlight="mint">
-              <i className="fa fa-circle color-mint-dark" />
-              <span className="color-mint-light">Mint</span>
-            </a>
-            <a href="#" data-change-highlight="green">
-              <i className="fa fa-circle color-green-light" />
-              <span className="color-green-light">Green</span>
-            </a>
-            <a href="#" data-change-highlight="grass">
-              <i className="fa fa-circle color-green-dark" />
-              <span className="color-green-dark">Grass</span>
-            </a>
-            <a href="#" data-change-highlight="sunny">
-              <i className="fa fa-circle color-yellow-light" />
-              <span className="color-yellow-light">Sunny</span>
-            </a>
-            <a href="#" data-change-highlight="yellow">
-              <i className="fa fa-circle color-yellow-dark" />
-              <span className="color-yellow-light">Goldish</span>
-            </a>
-            <a href="#" data-change-highlight="brown">
-              <i className="fa fa-circle color-brown-dark" />
-              <span className="color-brown-light">Wood</span>
-            </a>
-            <a href="#" data-change-highlight="night">
-              <i className="fa fa-circle color-dark-dark" />
-              <span className="color-dark-light">Night</span>
-            </a>
-            <a href="#" data-change-highlight="dark">
-              <i className="fa fa-circle color-dark-light" />
-              <span className="color-dark-light">Dark</span>
-            </a>
-            <div className="clearfix" />
-          </div>
-          <a
-            href="#"
-            data-menu="menu-settings"
-            className="mb-3 btn btn-full btn-m rounded-sm bg-highlight shadow-xl text-uppercase font-900 mt-4"
-          >
-            Back to Settings
-          </a>
-        </div>
-      </div>
-      {/* Menu Settings Backgrounds*/}
-      <div
-        id="menu-backgrounds"
-        className="menu menu-box-bottom menu-box-detached"
-      >
-        <div className="menu-title">
-          <h1>Backgrounds</h1>
-          <p className="color-highlight">
-            Change Page Color Behind Content Boxes
-          </p>
-          <a href="#" className="close-menu">
-            <i className="fa fa-times" />
-          </a>
-        </div>
-        <div className="divider divider-margins mb-n2" />
-        <div className="content">
-          <div className="background-changer">
-            <a href="#" data-change-background="default">
-              <i className="bg-theme" />
-              <span className="color-dark-dark">Default</span>
-            </a>
-            <a href="#" data-change-background="plum">
-              <i className="body-plum" />
-              <span className="color-plum-dark">Plum</span>
-            </a>
-            <a href="#" data-change-background="magenta">
-              <i className="body-magenta" />
-              <span className="color-dark-dark">Magenta</span>
-            </a>
-            <a href="#" data-change-background="dark">
-              <i className="body-dark" />
-              <span className="color-dark-dark">Dark</span>
-            </a>
-            <a href="#" data-change-background="violet">
-              <i className="body-violet" />
-              <span className="color-violet-dark">Violet</span>
-            </a>
-            <a href="#" data-change-background="red">
-              <i className="body-red" />
-              <span className="color-red-dark">Red</span>
-            </a>
-            <a href="#" data-change-background="green">
-              <i className="body-green" />
-              <span className="color-green-dark">Green</span>
-            </a>
-            <a href="#" data-change-background="sky">
-              <i className="body-sky" />
-              <span className="color-sky-dark">Sky</span>
-            </a>
-            <a href="#" data-change-background="orange">
-              <i className="body-orange" />
-              <span className="color-orange-dark">Orange</span>
-            </a>
-            <a href="#" data-change-background="yellow">
-              <i className="body-yellow" />
-              <span className="color-yellow-dark">Yellow</span>
-            </a>
-            <div className="clearfix" />
-          </div>
-          <a
-            href="#"
-            data-menu="menu-settings"
-            className="mb-3 btn btn-full btn-m rounded-sm bg-highlight shadow-xl text-uppercase font-900 mt-4"
-          >
-            Back to Settings
-          </a>
-        </div>
-      </div>
-      {/* Menu Share */}
-      <div id="menu-share" className="menu menu-box-bottom menu-box-detached">
-        <div className="menu-title mt-n1">
-          <h1>Share the Love</h1>
-          <p className="color-highlight">
-            Just Tap the Social Icon. Well add the Link
-          </p>
-          <a href="#" className="close-menu">
-            <i className="fa fa-times" />
-          </a>
-        </div>
-        <div className="content mb-0">
-          <div className="divider mb-0" />
-          <div className="list-group list-custom-small list-icon-0">
-            <a
-              href="auto_generated.html"
-              className="shareToFacebook external-link"
-            >
-              <i className="font-18 fab fa-facebook-square color-facebook" />
-              <span className="font-13">Facebook</span>
-              <i className="fa fa-angle-right" />
-            </a>
-            <a
-              href="auto_generated.html"
-              className="shareToTwitter external-link"
-            >
-              <i className="font-18 fab fa-twitter-square color-twitter" />
-              <span className="font-13">Twitter</span>
-              <i className="fa fa-angle-right" />
-            </a>
-            <a
-              href="auto_generated.html"
-              className="shareToLinkedIn external-link"
-            >
-              <i className="font-18 fab fa-linkedin color-linkedin" />
-              <span className="font-13">LinkedIn</span>
-              <i className="fa fa-angle-right" />
-            </a>
-            <a
-              href="auto_generated.html"
-              className="shareToWhatsApp external-link"
-            >
-              <i className="font-18 fab fa-whatsapp-square color-whatsapp" />
-              <span className="font-13">WhatsApp</span>
-              <i className="fa fa-angle-right" />
-            </a>
-            <a
-              href="auto_generated.html"
-              className="shareToMail external-link border-0"
-            >
-              <i className="font-18 fa fa-envelope-square color-mail" />
-              <span className="font-13">Email</span>
-              <i className="fa fa-angle-right" />
             </a>
           </div>
         </div>

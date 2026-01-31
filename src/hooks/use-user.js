@@ -1,21 +1,21 @@
 import { jwtDecode } from "jwt-decode";
 import { useMemo } from "react";
-import useContextState from "./useContextState";
+import { useSelector } from "react-redux";
 
 export const useUser = () => {
-  const { token } = useContextState();
+  const { adminToken } = useSelector((state) => state.auth);
 
   const user = useMemo(() => {
-    if (!token) return [];
+    if (!adminToken) return [];
 
     try {
-      const decoded = jwtDecode(token);
+      const decoded = jwtDecode(adminToken);
       return decoded;
     } catch (err) {
       console.error("Invalid JWT:", err);
       return [];
     }
-  }, [token]);
+  }, [adminToken]);
 
   return { user };
 };
