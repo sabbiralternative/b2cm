@@ -9,15 +9,10 @@ import { setUser } from "../../redux/features/auth/authSlice";
 const Login = () => {
   const dispatch = useDispatch();
   const [disabled, setDisabled] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+  // const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { register, handleSubmit } = useForm({
-    defaultValues: {
-      username: "alex",
-      password: "mumbai@000",
-    },
-  });
+  const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
 
   const onSubmit = async ({ username, password }) => {
@@ -100,11 +95,6 @@ const Login = () => {
   return (
     <div className="page-content pb-0">
       <div data-card-height="cover">
-        <div className="card-top notch-clear">
-          <a href="#" data-back-button className="me-auto icon icon-m">
-            <i className="font-14 fa fa-arrow-left color-white" />
-          </a>
-        </div>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="card-center bg-theme rounded-m mx-3"

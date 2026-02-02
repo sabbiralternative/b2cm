@@ -9,7 +9,7 @@ import moment from "moment";
 import Loader from "../../components/shared/Loader/Loader";
 
 const Home = () => {
-  const { adminRole } = useSelector((state) => state.auth);
+  const { adminRole, adminName } = useSelector((state) => state.auth);
   const today = new Date();
   const { user } = useUser();
   const [date, setDate] = useState(new Date());
@@ -58,7 +58,7 @@ const Home = () => {
               <strong className="text-uppercase opacity-60 font-11">
                 Welcome Back
               </strong>
-              <h1 className="mt-n2 font-27">{adminRole}</h1>
+              <h1 className="mt-n2 font-27">{adminName}</h1>
             </div>
             <div className="align-self-center ms-auto">
               <a href="#" className="d-block" data-menu="menu-settings">
@@ -78,13 +78,21 @@ const Home = () => {
                 <option value={1} disabled selected>
                   Select Time Frame
                 </option>
-                <option value={2} selected>
-                  Last 7 Days
+                <option style={{ color: "black" }} value={2} selected>
+                  Today
                 </option>
-                <option value={3}>Last 15 Days</option>
-                <option value={4}>Last 30 Days</option>
-                <option value={5}>Last 3 Months</option>
-                <option value={6}>Last 6 Months</option>
+                <option style={{ color: "black" }} value={3}>
+                  Last 15 Days
+                </option>
+                <option style={{ color: "black" }} value={4}>
+                  Last 30 Days
+                </option>
+                <option style={{ color: "black" }} value={5}>
+                  Last 3 Months
+                </option>
+                <option style={{ color: "black" }} value={6}>
+                  Last 6 Months
+                </option>
               </select>
               <span>
                 <i className="fa fa-chevron-down" />
@@ -282,7 +290,14 @@ const Home = () => {
                   <h4 className="font-700 text-uppercase font-12 opacity-50 mt-n2">
                     New users
                   </h4>
-                  <h1 className="font-700 font-34 color-red-dark mb-0">29</h1>
+                  <h1 className="font-700 font-34 color-red-dark mb-0">
+                    {" "}
+                    {isLoading || isPending ? (
+                      <Loader />
+                    ) : (
+                      balanceData?.usersToday
+                    )}
+                  </h1>
                   <i className="fa fa-arrow-right float-end mt-n3 opacity-20" />
                 </div>
               </div>
