@@ -1,20 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
 import useContextState from "../../../hooks/useContextState";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useState } from "react";
 import { usePermission } from "../../../hooks/use-permission";
 import { getNavItems } from "./navConfig";
 import { useSelector } from "react-redux";
-import useGetDWCountQuery from "../../../hooks/dwCount";
-import notification from "../../../assets/notification.wav";
 
 const Navigation = () => {
-  const [depositCount, setDepositCount] = useState(null);
-  const [withdrawCount, setWithdrawCount] = useState(null);
-  const depositRefCount = useRef(depositCount);
-  const withdrawRefCount = useRef(withdrawCount);
-  const [playSound, setPlaySound] = useState(false);
-
-  const { data: dwCount } = useGetDWCountQuery();
   const { adminRole } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const {
@@ -79,7 +70,7 @@ const Navigation = () => {
             <a onClick={() => handleOpenSidebarItem(navItem?.key)}>
               <i className="fa font-12 fa-file gradient-blue rounded-sm color-white" />
               <span>{navItem?.tab}</span>
-              {navItem?.key === "deposit" && depositCount > 0 && (
+              {/* {navItem?.key === "deposit" && depositCount > 0 && (
                 <span
                   style={{ backgroundColor: "#39da8a", color: "black" }}
                   className="badge  badge-small rounded-xl me-n1"
@@ -102,7 +93,7 @@ const Navigation = () => {
                 >
                   {dwCount?.claimCount}
                 </span>
-              )}
+              )} */}
 
               <i className="fa fa-angle-right" />
             </a>
@@ -219,26 +210,6 @@ const Navigation = () => {
       }
     });
   };
-
-  useEffect(() => {
-    if (dwCount?.depositCount >= 0 || dwCount?.withdrawCount >= 0) {
-      if (
-        (playSound &&
-          depositCount !== null &&
-          depositCount > depositRefCount.current) ||
-        (playSound &&
-          withdrawCount !== null &&
-          withdrawCount > withdrawRefCount.current)
-      ) {
-        new Audio(notification).play();
-      }
-      depositRefCount.current = depositCount;
-      withdrawRefCount.current = withdrawCount;
-      setDepositCount(dwCount?.depositCount);
-      setWithdrawCount(dwCount?.withdrawCount);
-      setPlaySound(true);
-    }
-  }, [depositCount, withdrawCount, playSound, dwCount]);
 
   return (
     <div className="card card-style">
