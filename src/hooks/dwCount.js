@@ -7,7 +7,8 @@ const useGetDWCountQuery = () => {
     queryKey: ["dwCount"],
     queryFn: async () => {
       const { data } = await AxiosSecure.post(API.dwCount);
-      return data;
+
+      return data?.result;
     },
     refetchInterval: 15000,
   });

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import useGetDWCountQuery from "../../../hooks/dwCount";
 import Loader from "../../shared/Loader/Loader";
-import notification from "../../../assets/notification.wav";
+import assets from "../../../assets";
 
 const UserDepositWithdrawCount = ({ isLoading, isPending, balanceData }) => {
   const { data: dwCount } = useGetDWCountQuery();
@@ -10,6 +10,7 @@ const UserDepositWithdrawCount = ({ isLoading, isPending, balanceData }) => {
   const depositRefCount = useRef(depositCount);
   const withdrawRefCount = useRef(withdrawCount);
   const [playSound, setPlaySound] = useState(false);
+
   useEffect(() => {
     if (dwCount?.depositCount >= 0 || dwCount?.withdrawCount >= 0) {
       if (
@@ -20,7 +21,7 @@ const UserDepositWithdrawCount = ({ isLoading, isPending, balanceData }) => {
           withdrawCount !== null &&
           withdrawCount > withdrawRefCount.current)
       ) {
-        new Audio(notification).play();
+        new Audio(assets.notification).play();
       }
       depositRefCount.current = depositCount;
       withdrawRefCount.current = withdrawCount;

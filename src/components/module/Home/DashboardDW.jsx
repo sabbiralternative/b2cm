@@ -1,8 +1,8 @@
 const DashboardDW = ({ data, emptyMessage, title }) => {
   return (
-    <div className="card card-style">
+    <div className="" style={{ marginBottom: "40px" }}>
       <div className="content mb-2">
-        <h3 style={{ marginBottom: "10px", fontSize: "16px" }}>{title}</h3>
+        <h3 style={{ marginBottom: "5px", fontSize: "15px" }}>{title}</h3>
         {/* <p>Dark tables are always gorgeous.</p> */}
         <table
           className="table table-borderless text-center rounded-sm shadow-l"
