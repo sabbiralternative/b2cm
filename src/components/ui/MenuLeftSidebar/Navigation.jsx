@@ -48,6 +48,7 @@ const Navigation = () => {
 
   const handleRenderSidebar = (navItems) => {
     return navItems?.map((navItem, navIndex) => {
+      /*! Dashboard text start  */
       if (navItem?.label) {
         if (!navItem?.show) return;
         return (
@@ -62,41 +63,22 @@ const Navigation = () => {
           </Link>
         );
       }
+      /*! Dashboard text end  */
 
       if (navItem?.tab) {
         if (!navItem?.show) return;
         return (
           <Fragment key={navIndex}>
+            {/* All link start */}
             <a onClick={() => handleOpenSidebarItem(navItem?.key)}>
               <i className="fa font-12 fa-file gradient-blue rounded-sm color-white" />
               <span>{navItem?.tab}</span>
-              {/* {navItem?.key === "deposit" && depositCount > 0 && (
-                <span
-                  style={{ backgroundColor: "#39da8a", color: "black" }}
-                  className="badge  badge-small rounded-xl me-n1"
-                >
-                  {depositCount}
-                </span>
-              )}
-              {navItem?.key === "withdraw" && withdrawCount > 0 && (
-                <span
-                  style={{ backgroundColor: "#39da8a", color: "black" }}
-                  className="badge  badge-small rounded-xl me-n1"
-                >
-                  {withdrawCount}
-                </span>
-              )}
-              {navItem?.key === "bonus" && dwCount > 0 && (
-                <span
-                  style={{ backgroundColor: "#39da8a", color: "black" }}
-                  className="badge  badge-small rounded-xl me-n1"
-                >
-                  {dwCount?.claimCount}
-                </span>
-              )} */}
 
               <i className="fa fa-angle-right" />
             </a>
+            {/* All link end */}
+
+            {/* Miscellaneous start */}
             {navItem?.willSubTab && sidebarItem === navItem?.key ? (
               navItem?.children?.map((child, childIndex) => {
                 if (!child?.show) return;
@@ -117,6 +99,7 @@ const Navigation = () => {
                         <i className="fa fa-angle-right"></i>
                       </a>
                       <div
+                        className="ps-3"
                         style={{
                           display:
                             childTabList === child?.key ? "flex" : "none",
@@ -169,8 +152,76 @@ const Navigation = () => {
                 id="collapse-1"
               >
                 <div className="list-group list-custom-small ps-3">
-                  {navItem?.children?.map((child) => {
+                  {navItem?.children?.map((child, childIndex) => {
                     if (!child?.show) return;
+
+                    /* Loss back start */
+                    if (child?.willSubTab) {
+                      return (
+                        <div
+                          key={childIndex}
+                          className={`collapse show`}
+                          id="collapse-1"
+                        >
+                          <div className="list-group list-custom-small">
+                            <a
+                              onClick={() =>
+                                handleOpenSidebarChildTabItem(child?.key)
+                              }
+                            >
+                              <i className="fab font-13 fa-facebook-square color-facebook"></i>
+                              <span>{child?.label}</span>
+                              <i className="fa fa-angle-right"></i>
+                            </a>
+                            <div
+                              className="ps-3"
+                              style={{
+                                display:
+                                  childTabList === child?.key ? "flex" : "none",
+                                flexDirection: "column",
+                              }}
+                            >
+                              {child?.children?.map((child) => {
+                                if (!child?.show) return;
+                                if (child?.href) {
+                                  return (
+                                    <a
+                                      key={child?.href}
+                                      onClick={() => {
+                                        navigate(child?.href);
+                                        setShowSidebar(false);
+                                      }}
+                                    >
+                                      <i className="fab font-13 fa-facebook-square color-facebook"></i>
+                                      <span>{child?.label}</span>
+                                      {/* <i className="fa fa-angle-right"></i> */}
+                                    </a>
+                                  );
+                                }
+                                if (child?.setState) {
+                                  return (
+                                    <a
+                                      key={child?.label}
+                                      onClick={() => {
+                                        child?.setState(true);
+                                        setShowSidebar(false);
+                                      }}
+                                    >
+                                      <i className="fab font-13 fa-facebook-square color-facebook"></i>
+                                      <span>{child?.label}</span>
+                                      {/* <i className="fa fa-angle-right"></i> */}
+                                    </a>
+                                  );
+                                }
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                    /* Loss back end */
+
+                    /* Child link start */
                     if (child?.href) {
                       return (
                         <a
@@ -201,6 +252,7 @@ const Navigation = () => {
                         </a>
                       );
                     }
+                    /* Child link end */
                   })}
                 </div>
               </div>
