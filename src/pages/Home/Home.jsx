@@ -285,7 +285,11 @@ const Home = () => {
             </div>
           </div>
         </div>
-        <UserDepositWithdrawCount />
+        <UserDepositWithdrawCount
+          balanceData={balanceData}
+          isLoading={isLoading}
+          isPending={isPending}
+        />
         {permissions.includes(Permission.deposit) && (
           <DashboardDW
             data={deposit}

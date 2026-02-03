@@ -1,9 +1,9 @@
 const DashboardDW = ({ data, emptyMessage, title }) => {
   return (
-    <div className="" style={{ marginBottom: "40px" }}>
+    <div className="">
       <div className="content mb-2">
         <h3 style={{ marginBottom: "5px", fontSize: "15px" }}>{title}</h3>
-        {/* <p>Dark tables are always gorgeous.</p> */}
+
         <table
           className="table table-borderless text-center rounded-sm shadow-l"
           style={{ overflow: "hidden" }}
@@ -12,19 +12,19 @@ const DashboardDW = ({ data, emptyMessage, title }) => {
             <tr>
               <th
                 scope="col"
-                className="bg-night-light border-dark-dark py-3 color-white"
+                className="bg-night-light border-dark-dark  color-white"
               >
                 BranchName
               </th>
               <th
                 scope="col"
-                className="bg-night-light border-dark-dark py-3 color-white"
+                className="bg-night-light border-dark-dark color-white"
               >
                 Count
               </th>
               <th
                 scope="col"
-                className="bg-night-light border-dark-dark py-3 color-white"
+                className="bg-night-light border-dark-dark  color-white"
               >
                 Amount
               </th>
