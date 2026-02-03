@@ -8,6 +8,8 @@ import { useBalanceQuery } from "../../hooks/balance";
 import moment from "moment";
 import Loader from "../../components/shared/Loader/Loader";
 import UserDepositWithdrawCount from "../../components/module/Home/UserDepositWithdrawCount";
+import DashboardDW from "../../components/module/Home/DashboardDW";
+import { AdminRole, Permission } from "../../constant/constant";
 
 const Home = () => {
   const { adminRole, adminName } = useSelector((state) => state.auth);
@@ -284,94 +286,38 @@ const Home = () => {
           </div>
         </div>
         <UserDepositWithdrawCount />
-        <div className="card card-style">
-          <div className="content mb-0">
-            <div className="row mb-2 mt-n2">
-              <div className="col-6 text-start">
-                <h4 className="font-700 text-uppercase font-12 opacity-50">
-                  Notifications
-                </h4>
-              </div>
-              <div className="col-6 text-end">
-                <a href="#" className="font-12">
-                  View All
-                </a>
-              </div>
-            </div>
-            <div className="divider mb-3" />
-            <a href="#" className="item">
-              <div className="d-flex mb-4">
-                <div className="pe-3">
-                  <span className="icon icon-xs bg-fade-blue-light rounded-sm">
-                    <i className="color-blue-dark fa fa-plus" />
-                  </span>
-                </div>
-                <div className="align-self-center w-100">
-                  <p className="line-height-s font-12 font-400">
-                    Your account has been added to
-                    <strong className="font-800">Web Design</strong> by
-                    <strong className="font-800">Admin</strong>
-                    <span className="badge bg-blue-dark color-white ms-2">
-                      UPDATE
-                    </span>
-                  </p>
-                </div>
-                <div className="align-self-center flex-grow-1">
-                  <p className="ps-3 font-10 line-height-xs text-center opacity-40">
-                    15 sec
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="#" className="item">
-              <div className="d-flex mb-4">
-                <div className="pe-3">
-                  <span className="icon icon-xs bg-fade-green-light rounded-sm">
-                    <i className="color-green-dark fa fa-check" />
-                  </span>
-                </div>
-                <div className="align-self-center w-100">
-                  <p className="line-height-s font-12 font-400">
-                    <strong className="font-800">AppKit</strong> Mobile update
-                    has been completed. Good job!
-                    <span className="badge bg-green-dark color-white ms-2">
-                      COMPLETE
-                    </span>
-                  </p>
-                </div>
-                <div className="align-self-center flex-grow-1">
-                  <p className="ps-3 font-10 line-height-xs text-center opacity-40">
-                    10 min
-                  </p>
-                </div>
-              </div>
-            </a>
-            <a href="#" className="item">
-              <div className="d-flex mb-4">
-                <div className="pe-3">
-                  <span className="icon icon-xs bg-fade-red-light rounded-sm">
-                    <i className="color-red-dark fa fa-times" />
-                  </span>
-                </div>
-                <div className="align-self-center w-100">
-                  <p className="line-height-s font-12 font-400">
-                    Mockups Rejected. Event
-                    <strong className="font-800">Emergency Meeting</strong>{" "}
-                    created by <strong className="font-800">Admin</strong>.
-                    <span className="badge bg-red-dark color-white ms-2">
-                      URGENT
-                    </span>
-                  </p>
-                </div>
-                <div className="align-self-center flex-grow-1">
-                  <p className="ps-3 font-10 line-height-xs text-center opacity-40">
-                    10 hrs
-                  </p>
-                </div>
-              </div>
-            </a>
-          </div>
-        </div>
+        {permissions.includes(Permission.deposit) && (
+          <DashboardDW
+            data={deposit}
+            title="Pending Deposit"
+            emptyMessage="No pending deposit"
+          />
+        )}
+        {permissions.includes(Permission.withdraw) && (
+          <DashboardDW
+            data={withdraw}
+            title="Pending Withdraw"
+            emptyMessage="No pending withdraw"
+          />
+        )}
+        {(adminRole === AdminRole.hyper_master ||
+          adminRole === AdminRole.admin_staff) &&
+          permissions.includes(Permission.deposit) && (
+            <DashboardDW
+              data={rejected_deposit}
+              title="Rejected Deposit"
+              emptyMessage="No rejected deposit"
+            />
+          )}
+        {(adminRole === AdminRole.hyper_master ||
+          adminRole === AdminRole.admin_staff) &&
+          permissions.includes(Permission.withdraw) && (
+            <DashboardDW
+              data={rejected_withdraw}
+              title="Rejected Withdraw"
+              emptyMessage="No rejected withdraw"
+            />
+          )}
       </div>
     </div>
   );
